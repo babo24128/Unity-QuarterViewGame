@@ -7,13 +7,26 @@ public class Player : MonoBehaviour
     public float speed;
     public GameObject[] weapons;
     public bool[] hasWeapons;
+    public GameObject[] grenades;
+    public int hasGrenades;
 
-    //Input Axis 값을 받을 전역변수 선언
+    public int ammo;
+    public int coin;
+    public int health;
+
+
+    public int maxAmmo;
+    public int maxCoin;
+    public int maxHealth;
+    public int maxHasGrenades;
+
+    //Input Axis 값을 받을 전역변수 선언 
     float hAxis;
     float vAxis;
 
     bool wDown;
     bool jDown;
+    bool fDown;
     bool iDown;
     bool sDown1;
     bool sDown2;
@@ -22,7 +35,7 @@ public class Player : MonoBehaviour
     bool isJump;
     bool isDodge;
     bool isSwap;
-  
+    bool isFireReady = true;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
@@ -34,9 +47,11 @@ public class Player : MonoBehaviour
     GameObject nearObject;
 
     // 기존에 장착된 무기를 저장하는 변수를 선언하고 활용
-    GameObject equipWeapon;
+    Weapon equipWeapon;
 
     int equipWeaponIndex = -1;
+
+    float fireDelay;
 
     private void Awake()
     {
@@ -57,6 +72,7 @@ public class Player : MonoBehaviour
         Move();
         Turn();
         Jump();
+        Attack();
         Dodge();
         Swap();
         Interation();
@@ -70,6 +86,7 @@ public class Player : MonoBehaviour
         //Shift는 누를 때만 작동하도록 GetButton() 함수 사용
         wDown = Input.GetButton("Walk");
         jDown = Input.GetButton("Jump");
+        fDown = Input.GetButton("Fire1");
         iDown = Input.GetButtonDown("Interation");
         sDown1 = Input.GetButtonDown("Swap1");
         sDown2 = Input.GetButtonDown("Swap2");
@@ -82,8 +99,9 @@ public class Player : MonoBehaviour
 
         if (isDodge)
             moveVec = dodgeVec;
-
-        if (isSwap)
+        
+        // 스왑과 공격중엔 움직이지 못하도록
+        if (isSwap || !isFireReady)
             moveVec = Vector3.zero;
         
         if (wDown)
@@ -117,6 +135,22 @@ public class Player : MonoBehaviour
             anim.SetBool("isJump",true);
             anim.SetTrigger("doJump");
             isJump = true;
+        }
+    }
+
+    void Attack()
+    {
+        if (equipWeapon == null)
+            return;
+
+        fireDelay += Time.deltaTime;
+        isFireReady = equipWeapon.rate < fireDelay;
+
+        if(fDown && isFireReady && !isDodge && !isSwap)
+        {
+            equipWeapon.Use();
+            anim.SetTrigger("doSwing");
+            fireDelay = 0;
         }
     }
 
@@ -172,11 +206,11 @@ public class Player : MonoBehaviour
         if ((sDown1 || sDown2 || sDown3) && !isJump && !isDodge)
         {
             if(equipWeapon != null)
-                 equipWeapon.SetActive(false);
+                 equipWeapon.gameObject.SetActive(false);
 
             equipWeaponIndex = weaponIndex;
-            equipWeapon = weapons[weaponIndex];
-            equipWeapon.SetActive(true);
+            equipWeapon = weapons[weaponIndex].GetComponent<Weapon>();
+            equipWeapon.gameObject.SetActive(true);
 
             anim.SetTrigger("doSwap");
 
@@ -207,14 +241,56 @@ public class Player : MonoBehaviour
         }
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+   
+
+
+            if (other.tag == "Item")
+            {
+                Item item = other.GetComponent<Item>();
+                switch (item.type)
+                {
+                    case Item.Type.Ammo:
+                        ammo += item.value;
+                        if (ammo > maxAmmo)
+                            ammo = maxAmmo;
+                        break;
+                    case Item.Type.Coin:
+                        coin += item.value;
+                        if (coin > maxCoin)
+                            coin = maxCoin;
+                        break;
+                    case Item.Type.Heart:
+                        health += item.value;
+                        if (health > maxHealth)
+                            health = maxHealth;
+                        break;
+                    case Item.Type.Grenade:
+                    // 수류탄 개수대로 공전체가 활성화 되도록 구현
+                    if (hasGrenades == maxHasGrenades)
+                        return;
+                    grenades[hasGrenades].SetActive(true);
+                    hasGrenades += item.value;
+                    break;
+
+                }
+           
+
+            Destroy(other.gameObject);
+        }    
+    }
+
     // 트리거 이벤트인 OnTriggerStay, Exit 사용
     void OnTriggerStay(Collider other)
     {
         // Weapon 태그를 조건으로 하여 로직 작성
         if (other.tag == "Weapon")
+        {
             nearObject = other.gameObject;
 
-        Debug.Log(nearObject.name);
+            Debug.Log(nearObject.name);
+        }
     }
 
     void OnTriggerExit(Collider other)
