@@ -11,16 +11,28 @@ public class Item : MonoBehaviour
     public Type type;
     public int value;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    Rigidbody rigid;
+    SphereCollider sphereCollider;
 
+    void Awake()
+    {
+        rigid = GetComponent<Rigidbody>();
+        sphereCollider = GetComponent<SphereCollider>();
+    }
     // Update is called once per frame
     void Update()
     {
         // Rotate() 함수로 계속 회전 효과
         transform.Rotate(Vector3.up * 20 * Time.deltaTime);
     }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Floor")
+        {
+            rigid.isKinematic = true;
+            sphereCollider.enabled = false;
+        }    
+    }
+
 }

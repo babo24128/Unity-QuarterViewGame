@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1749011798482543148}
   - component: {fileID: 8575578798474345265}
-  - component: {fileID: 8575578798474345267}
   - component: {fileID: 8575578798474345266}
+  - component: {fileID: 8575578798474345267}
   - component: {fileID: 8575578798474345264}
   m_Layer: 0
   m_Name: Weapon Grenade
@@ -54,19 +54,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!135 &8575578798474345267
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1373154071643732118}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &8575578798474345266
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -79,6 +66,19 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &8575578798474345267
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1373154071643732118}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8575578798474345264
 MonoBehaviour:
